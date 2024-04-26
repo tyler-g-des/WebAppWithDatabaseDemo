@@ -48,8 +48,8 @@ jobs:
     displayName: 'Prepare analysis on SonarCloud'
     inputs:
       SonarCloud: SonarCloud
-      organization: houssemdellai
-      projectKey: WebAppWithDatabaseDemo
+      organization: tyler-g-des
+      projectKey: tyler-g-des
   
   - task: DotNetCoreCLI@2
     displayName: Build
@@ -82,58 +82,3 @@ jobs:
     displayName: 'Publish Artifact (WebApp.zip)'
     inputs:
       PathtoPublish: '$(build.artifactstagingdirectory)'
-
-- job: Database
-  displayName: 'Build Database'
-  pool:
-    vmImage: 'windows-2019'
-
-  steps:
-  - task: MSBuild@1
-    displayName: 'Build solution WebApp.Database.sqlproj'
-    inputs:
-      solution: WebApp.Database/WebApp.Database.sqlproj
-      msbuildArguments: '/p:OutDir=$(Build.ArtifactStagingDirectory)'
-  
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact (Dacpac)'
-    inputs:
-      ArtifactName: dacpac
-
-- job: Selenium
-  displayName: 'Build UI Tests'
-  pool:
-    vmImage: 'windows-2019'
-
-  steps:
-  - task: NuGetToolInstaller@0
-    displayName: 'Use NuGet 4.3.0'
-
-  - task: NuGetCommand@2
-    displayName: 'NuGet restore'
-    inputs:
-      restoreSolution: WebAppWithDatabase.sln
-
-  - task: MSBuild@1
-    displayName: 'Build project SeleniumUiTests.csproj'
-    inputs:
-      solution: SeleniumUiTests/SeleniumUiTests.csproj
-      msbuildArguments: '/p:OutDir=$(Build.ArtifactStagingDirectory)'
-
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: UI-Test'
-    inputs:
-      ArtifactName: 'UI-Test'
-
-- job: Infrastructure
-  displayName: 'Copy Infrastructure files (ARM)'
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: ARM templates'
-    inputs:
-      PathtoPublish: AzureResourceGroupDeployment
-      ArtifactName: arm
-
-
